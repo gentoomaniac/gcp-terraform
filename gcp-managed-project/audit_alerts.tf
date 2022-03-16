@@ -1,5 +1,5 @@
 resource "google_logging_metric" "project_ownership_and_assignment_changes" {
-  for_each = var.alerts
+  for_each = var.audit_alerts
 
   description = each.value.description
   filter      = each.value.filter
@@ -11,11 +11,11 @@ resource "google_logging_metric" "project_ownership_and_assignment_changes" {
   }
 
   name    = each.key
-  project = var.gcp_project_name
+  project = var.project_name
 }
 
 resource "google_monitoring_alert_policy" "alertPolicies-project_ownership_and_assignment_changes" {
-  for_each = var.alerts
+  for_each = var.audit_alerts
   combiner = "OR"
 
   conditions {
@@ -42,15 +42,18 @@ resource "google_monitoring_alert_policy" "alertPolicies-project_ownership_and_a
 
   display_name          = each.value.description
   enabled               = "true"
-  project               = var.gcp_project_name
   notification_channels = [google_monitoring_notification_channel.gcp_alert_email.name]
   depends_on            = [google_logging_metric.project_ownership_and_assignment_changes, google_monitoring_notification_channel.gcp_alert_email]
+
+  project = var.project_name
 }
 
 resource "google_monitoring_notification_channel" "gcp_alert_email" {
   display_name = "Alert Notifications"
   type         = "email"
   labels = {
-    email_address = "alerts+${var.gcp_project_name}@siebecke.se"
+    email_address = "alerts+${var.project_name}@siebecke.se"
   }
+  
+  project = var.project_name
 }
