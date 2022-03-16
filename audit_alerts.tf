@@ -51,6 +51,6 @@ resource "google_monitoring_notification_channel" "gcp_alert_email" {
   display_name = "Alert Notifications"
   type         = "email"
   labels = {
-    email_address = "alerts#${var.gcp_project_name}@siebecke.se"
+    email_address = "alerts+${var.gcp_project_name}@siebecke.se"
   }
 }
